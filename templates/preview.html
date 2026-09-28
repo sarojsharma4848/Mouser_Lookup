@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Choose a Column - Mouser Part Lookup</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Which column has the part numbers?</h1>
+    <p class="subtitle">
+      Loaded <strong>{{ filename }}</strong> &mdash; {{ row_count }} row(s) found.
+      Pick the column to use below.
+    </p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('upload') }}" method="post">
+      <input type="hidden" name="api_key" value="{{ api_key }}">
+      <input type="hidden" name="encoded_csv" value="{{ encoded_csv }}">
+      <input type="hidden" name="display_currency" value="{{ display_currency }}">
+
+      <label>
+        <input type="checkbox" name="has_header" checked>
+        First row is a header row (skip it when looking up parts)
+      </label>
+
+      <label style="margin-top:20px;">Column to use as the part number</label>
+      <div class="column-choices">
+        {% for index, sample_value in columns %}
+          <label class="column-option">
+            <input type="radio" name="column_index" value="{{ index }}" {% if index == 0 %}checked{% endif %}>
+            Column {{ index + 1 }}
+            <span class="hint">(sample: "{{ sample_value }}")</span>
+          </label>
+        {% endfor %}
+      </div>
+
+      <button type="submit">Look Up Parts</button>
+    </form>
+  </div>
+</body>
+</html>

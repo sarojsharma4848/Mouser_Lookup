@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mouser Part Lookup</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Mouser Part Number Lookup</h1>
+    <p class="subtitle">Upload a CSV with part numbers in the first column. Each one will be looked up via the Mouser Search API.</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('preview') }}" method="post" enctype="multipart/form-data">
+      <label for="api_key">Mouser API Key</label>
+      <input type="password" id="api_key" name="api_key" placeholder="Paste your API key" value="{{ default_key }}">
+      <p class="hint">Or set the <code>MOUSER_API_KEY</code> environment variable and leave this blank.</p>
+
+      <label for="csv_file">CSV File</label>
+      <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
+
+      <label for="display_currency">Display Currency</label>
+      <select id="display_currency" name="display_currency">
+        <option value="USD" selected>USD ($) &mdash; native Mouser price</option>
+        <option value="CAD">CAD ($)</option>
+        <option value="EUR">EUR (&euro;)</option>
+        <option value="GBP">GBP (&pound;)</option>
+        <option value="INR">INR (&#8377;)</option>
+        <option value="AUD">AUD ($)</option>
+        <option value="MXN">MXN ($)</option>
+        <option value="JPY">JPY (&yen;)</option>
+        <option value="CHF">CHF</option>
+      </select>
+      <p class="hint">Mouser returns prices in USD; anything else is converted using a live exchange rate for reference only.</p>
+
+      <button type="submit">Next: Choose Column</button>
+    </form>
+  </div>
+</body>
+</html>

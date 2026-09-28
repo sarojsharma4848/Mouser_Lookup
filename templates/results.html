@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lookup Results - Mouser Part Lookup</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container wide">
+    <h1>Lookup Results</h1>
+    <p class="subtitle"><a href="{{ url_for('index') }}">&larr; Look up another file</a></p>
+
+    {% if display_currency != 'USD' %}
+      <p class="currency-note">
+        Prices converted from USD to {{ display_currency }}
+        {% if fx_rate %} at 1 USD &asymp; {{ "%.4f"|format(fx_rate) }} {{ display_currency }}{% endif %}
+        {% if fx_date %} (rate date: {{ fx_date }}){% endif %} &mdash; for reference only, not an official Mouser quote.
+      </p>
+    {% endif %}
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Query</th>
+            <th>Mouser #</th>
+            <th>Manufacturer</th>
+            <th>MPN</th>
+            <th>Description</th>
+            <th>Lifecycle</th>
+            <th>Availability</th>
+            <th>MOQ / Multiple</th>
+            <th>Qty Needed</th>
+            <th>Unit Price ({{ display_currency }})</th>
+            <th>Extended Cost ({{ display_currency }})</th>
+            <th>Tip</th>
+            <th>Link</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results %}
+            {% if row.product %}
+              {% set p = row.product %}
+              <tr class="calc-row" data-pricing='{{ row.pricing_json|safe }}'>
+                <td>{{ row.query }}</td>
+                <td>{{ p.get('MouserPartNumber', '') }}</td>
+                <td>{{ p.get('Manufacturer', '') }}</td>
+                <td>{{ p.get('ManufacturerPartNumber', '') }}</td>
+                <td>{{ p.get('Description', '') }}</td>
+                <td>{{ p.get('LifecycleStatus', '') }}</td>
+                <td>{{ p.get('Availability', '') }}</td>
+                <td class="moq-cell">&mdash;</td>
+                <td>
+                  <input type="number" class="qty-input" min="1" value="1" style="width:80px;">
+                </td>
+                <td class="unit-price-cell">&mdash;</td>
+                <td class="ext-cost-cell">&mdash;</td>
+                <td class="tip-cell">&mdash;</td>
+                <td>
+                  {% if p.get('ProductDetailUrl') %}
+                    <a href="{{ p.get('ProductDetailUrl') }}" target="_blank">View</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% else %}
+              <tr class="error-row">
+                <td>{{ row.query }}</td>
+                <td colspan="12">{{ row.error }}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='calc.js') }}"></script>
+</body>
+</html>
